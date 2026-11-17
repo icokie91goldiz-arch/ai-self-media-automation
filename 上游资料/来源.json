@@ -1,0 +1,12 @@
+[
+  {
+    "directory": "tianfeng-workbench",
+    "upstream": "https://github.com/CzzzzzzJ/mdldm-maitian.git",
+    "commit": "61ffcf054f236d93573c74bea43f1f61b9d260e4"
+  },
+  {
+    "directory": "tianfeng-publisher",
+    "upstream": "https://github.com/CzzzzzzJ/mdldm-maitian-publisher.git",
+    "commit": "539091cff24fb8ce32c28d881100a69886aced3a"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "name": "tianfeng-workbench",
+  "version": "0.3.0",
+  "description": "天锋：自媒体多平台发布中控与数据监控（B站/抖音/小红书/视频号/YouTube/X）",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "bin": {
+    "tianfeng": "src/hub.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CzzzzzzJ/mdldm-maitian.git"
+  }
+}

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f5f5f7">
+<title>天锋</title>
+<meta name="apple-mobile-web-app-title" content="天锋">
+<link rel="apple-touch-icon" href="/static/icon-180.png?v=tf-blue-1">
+<link rel="icon" href="/static/icon-180.png?v=tf-blue-1">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/static/mt.css">
+</head>
+<body>
+<div class="bgfx"><i></i><i></i><i></i></div>
+<div class="screen" id="screen"><div class="empty">加载中…</div></div>
+<div id="tip"></div>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = (n) => n == null ? '–' : Math.round(n).toLocaleString('en-US');
+const kfmt = (n) => n == null ? '–' : n >= 100000 ? (n / 10000).toFixed(1) + ' 万' : fmt(n);
+const sgn = (n) => (n > 0 ? '+' : '') + fmt(n);
+const pad = (n) => String(n).padStart(2, '0');
+const pct = (a, b, d = 0) => b ? (a / b * 100).toFixed(d) + '%' : '–';
+let PL = ['bilibili', 'douyin', 'xhs', 'channels', 'youtube', 'x', 'instagram', 'zsz'], FANP = ['bilibili', 'douyin', 'xhs', 'channels', 'youtube', 'x', 'instagram'];
+const PN = { bilibili: 'B站', douyin: '抖音', xhs: '小红书', channels: '视频号', youtube: 'YouTube', x: 'X', instagram: 'Instagram', zsz: '知识站' };
+const LOGO = {"bilibili": {"d": "M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373Z", "bg": "#00a1d6"}, "douyin": {"d": "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z", "bg": "#16161a", "dark": 1}, "xhs": {"d": "M22.405 9.879c.002.016.01.02.07.019h.725a.797.797 0 0 0 .78-.972.794.794 0 0 0-.884-.618.795.795 0 0 0-.692.794c0 .101-.002.666.001.777zm-11.509 4.808c-.203.001-1.353.004-1.685.003a2.528 2.528 0 0 1-.766-.126.025.025 0 0 0-.03.014L7.7 16.127a.025.025 0 0 0 .01.032c.111.06.336.124.495.124.66.01 1.32.002 1.981 0 .01 0 .02-.006.023-.015l.712-1.545a.025.025 0 0 0-.024-.036zM.477 9.91c-.071 0-.076.002-.076.01a.834.834 0 0 0-.01.08c-.027.397-.038.495-.234 3.06-.012.24-.034.389-.135.607-.026.057-.033.042.003.112.046.092.681 1.523.787 1.74.008.015.011.02.017.02.008 0 .033-.026.047-.044.147-.187.268-.391.371-.606.306-.635.44-1.325.486-1.706.014-.11.021-.22.03-.33l.204-2.616.022-.293c.003-.029 0-.033-.03-.034zm7.203 3.757a1.427 1.427 0 0 1-.135-.607c-.004-.084-.031-.39-.235-3.06a.443.443 0 0 0-.01-.082c-.004-.011-.052-.008-.076-.008h-1.48c-.03.001-.034.005-.03.034l.021.293c.076.982.153 1.964.233 2.946.05.4.186 1.085.487 1.706.103.215.223.419.37.606.015.018.037.051.048.049.02-.003.742-1.642.804-1.765.036-.07.03-.055.003-.112zm3.861-.913h-.872a.126.126 0 0 1-.116-.178l1.178-2.625a.025.025 0 0 0-.023-.035l-1.318-.003a.148.148 0 0 1-.135-.21l.876-1.954a.025.025 0 0 0-.023-.035h-1.56c-.01 0-.02.006-.024.015l-.926 2.068c-.085.169-.314.634-.399.938a.534.534 0 0 0-.02.191.46.46 0 0 0 .23.378.981.981 0 0 0 .46.119h.59c.041 0-.688 1.482-.834 1.972a.53.53 0 0 0-.023.172.465.465 0 0 0 .23.398c.15.092.342.12.475.12l1.66-.001c.01 0 .02-.006.023-.015l.575-1.28a.025.025 0 0 0-.024-.035zm-6.93-4.937H3.1a.032.032 0 0 0-.034.033c0 1.048-.01 2.795-.01 6.829 0 .288-.269.262-.28.262h-.74c-.04.001-.044.004-.04.047.001.037.465 1.064.555 1.263.01.02.03.033.051.033.157.003.767.009.938-.014.153-.02.3-.06.438-.132.3-.156.49-.419.595-.765.052-.172.075-.353.075-.533.002-2.33 0-4.66-.007-6.991a.032.032 0 0 0-.032-.032zm11.784 6.896c0-.014-.01-.021-.024-.022h-1.465c-.048-.001-.049-.002-.05-.049v-4.66c0-.072-.005-.07.07-.07h.863c.08 0 .075.004.075-.074V8.393c0-.082.006-.076-.08-.076h-3.5c-.064 0-.075-.006-.075.073v1.445c0 .083-.006.077.08.077h.854c.075 0 .07-.004.07.07v4.624c0 .095.008.084-.085.084-.37 0-1.11-.002-1.304 0-.048.001-.06.03-.06.03l-.697 1.519s-.014.025-.008.036c.006.01.013.008.058.008 1.748.003 3.495.002 5.243.002.03-.001.034-.006.035-.033v-1.539zm4.177-3.43c0 .013-.007.023-.02.024-.346.006-.692.004-1.037.004-.014-.002-.022-.01-.022-.024-.005-.434-.007-.869-.01-1.303 0-.072-.006-.071.07-.07l.733-.003c.041 0 .081.002.12.015.093.025.16.107.165.204.006.431.002 1.153.001 1.153zm2.67.244a1.953 1.953 0 0 0-.883-.222h-.18c-.04-.001-.04-.003-.042-.04V10.21c0-.132-.007-.263-.025-.394a1.823 1.823 0 0 0-.153-.53 1.533 1.533 0 0 0-.677-.71 2.167 2.167 0 0 0-1-.258c-.153-.003-.567 0-.72 0-.07 0-.068.004-.068-.065V7.76c0-.031-.01-.041-.046-.039H17.93s-.016 0-.023.007c-.006.006-.008.012-.008.023v.546c-.008.036-.057.015-.082.022h-.95c-.022.002-.028.008-.03.032v1.481c0 .09-.004.082.082.082h.913c.082 0 .072.128.072.128V11.19s.003.117-.06.117h-1.482c-.068 0-.06.082-.06.082v1.445s-.01.068.064.068h1.457c.082 0 .076-.006.076.079v3.225c0 .088-.007.081.082.081h1.43c.09 0 .082.007.082-.08v-3.27c0-.029.006-.035.033-.035l2.323-.003c.098 0 .191.02.28.061a.46.46 0 0 1 .274.407c.008.395.003.79.003 1.185 0 .259-.107.367-.33.367h-1.218c-.023.002-.029.008-.028.033.184.437.374.871.57 1.303a.045.045 0 0 0 .04.026c.17.005.34.002.51.003.15-.002.517.004.666-.01a2.03 2.03 0 0 0 .408-.075c.59-.18.975-.698.976-1.313v-1.981c0-.128-.01-.254-.034-.38 0 .078-.029-.641-.724-.998z", "bg": "#ff2442"}, "channels": {"stroke": "M12 12c-2.4-3.9-4.6-5.8-6.9-5.8-2.2 0-3.6 2.2-3.6 5.8s1.4 5.8 3.6 5.8c2.3 0 4.5-1.9 6.9-5.8zm0 0c2.4 3.9 4.6 5.8 6.9 5.8 2.2 0 3.6-2.2 3.6-5.8s-1.4-5.8-3.6-5.8c-2.3 0-4.5 1.9-6.9 5.8z", "bg": "#fa9d3b"}, "youtube": {"d": "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", "bg": "#ff0033"}, "x": {"d": "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z", "bg": "#16161a", "dark": 1}, "instagram": {"stroke": "M7 2.5h10A4.5 4.5 0 0 1 21.5 7v10a4.5 4.5 0 0 1-4.5 4.5H7A4.5 4.5 0 0 1 2.5 17V7A4.5 4.5 0 0 1 7 2.5zM12 8a4 4 0 1 0 0 8 4 4 0 1 0 0-8zM17.3 6.7h.01", "bg": "#d6246e"}, "zsz": {"d": "M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z", "bg": "#5e5ce6"}};
+const logo = (p) => { const l = LOGO[p]; return `<span class="lg${l.dark ? ' dark' : ''}" style="--bg:${l.bg}">${l.img ? `<img src="${l.img}" alt="">` : `<svg viewBox="0 0 24 24">${l.stroke ? `<path d="${l.stroke}" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>` : `<path d="${l.d}" fill="#fff"/>`}</svg>`}</span>`; };
+const FAN_WORD = { youtube: '订阅', zsz: '注册用户', channels: '关注者' };
+const safeUrl = (u) => /^https?:\/\//.test(u || '') ? esc(u) : '';
+const dayStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const daysBack = (n) => Array.from({ length: n }, (_, i) => dayStr(new Date(Date.now() - (n - 1 - i) * 864e5)));
+if (new URLSearchParams(location.search).get('kiosk')) document.body.classList.add('kiosk');
+let O = null, F = {};
+const sum = (arr, k) => arr.reduce((s, r) => s + (r[k] || 0), 0);
+const inter = (m) => m ? (m.likes || 0) + (m.comments || 0) + (m.favorites || 0) + (m.shares || 0) : 0;
+const task = (e, p) => e && e.tasks.find(t => t.platform === p);
+const M = (e, p) => (task(e, p) || {}).m || null;
+
+// —— 粉丝 ——
+const latest = (p) => { const d = Object.keys(F[p] || {}).sort(); return d.length ? F[p][d[d.length - 1]] : null; };
+const gainN = (p, n) => { const t = dayStr(new Date()), b = dayStr(new Date(Date.now() - n * 864e5)); return F[p] && F[p][t] != null && F[p][b] != null ? F[p][t] - F[p][b] : null; };
+const netOn = (p, d) => { const prev = dayStr(new Date(new Date(d + 'T12:00').getTime() - 864e5)); return F[p] && F[p][d] != null && F[p][prev] != null ? F[p][d] - F[p][prev] : null; };
+const gp = (label, v) => v == null ? '' : `<span class="gpill">${label}<b class="${v < 0 ? 'neg' : ''}">${sgn(v)}</b></span>`;
+
+function niceMax(v) { const p = Math.pow(10, Math.floor(Math.log10(Math.max(v, 1)))); const m = v / p; return (m <= 1 ? 1 : m <= 1.5 ? 1.5 : m <= 2 ? 2 : m <= 3 ? 3 : m <= 4 ? 4 : m <= 5 ? 5 : m <= 7.5 ? 7.5 : 10) * p; }
+// 每日净增：按平台堆叠的柱，发布日打标记
+function drawFans(el, days, marks) {
+  const w = el.clientWidth, h = el.clientHeight; if (w < 60 || h < 60) return;
+  const L = 40, R = 6, T = 20, B = 20, n = days.length, pw = w - L - R, ph = h - T - B, band = pw / n, bw = Math.min(22, Math.max(3, band - 4));
+  drawFans.lastLab = -1e9;
+  const rows = days.map(d => ({ d, segs: FANP.map(p => ({ p, v: Math.max(0, netOn(p, d) || 0) })).filter(x => x.v > 0) }));
+  rows.forEach(r => r.tot = r.segs.reduce((s, x) => s + x.v, 0));
+  const top = niceMax(Math.max(...rows.map(r => r.tot), 1)), Y = (v) => T + ph - v / top * ph;
+  let s = `<svg width="${w}" height="${h}"><defs>${FANP.map(p => `<linearGradient id="fg-${p}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--p-${p})"/><stop offset="1" stop-color="var(--p-${p})" stop-opacity=".55"/></linearGradient>`).join('')}</defs>`;
+  for (const t of [0, top / 2, top]) s += `<line x1="${L}" x2="${w - R}" y1="${Y(t)}" y2="${Y(t)}" stroke="rgba(0,0,0,.07)"/><text x="${L - 6}" y="${Y(t) + 4}" text-anchor="end">${t ? '+' : ''}${fmt(t)}</text>`;
+  rows.forEach((r, i) => {
+    const x = L + i * band + (band - bw) / 2; let acc = 0;
+    r.segs.forEach((g, j) => { const y1 = Y(acc), y2 = Y(acc + g.v), hh = Math.max(1.5, y1 - y2 - (j < r.segs.length - 1 ? 2 : 0)); acc += g.v;
+      s += `<rect class="bar" style="animation-delay:${i * 16}ms" x="${x.toFixed(1)}" y="${(y1 - (y1 - y2)).toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="${j === r.segs.length - 1 ? Math.min(4, bw / 2) : 1.5}" fill="url(#fg-${g.p})"/>`; });
+    let mk = marks[r.d]; const nx = rows[i + 1] && marks[rows[i + 1].d], pv = rows[i - 1] && marks[rows[i - 1].d];
+    let lab = !mk || nx ? '' : pv ? pv + ' / ' + mk : mk;
+    // 发布日一多标签会叠在一起：离上一个标签不到 130px 就只画虚线不写字（悬停仍能看到）
+    const cx = x + bw / 2; if (lab && cx - (drawFans.lastLab ?? -1e9) < 130) lab = ''; else if (lab) { drawFans.lastLab = cx; if (lab.length > 14) lab = lab.slice(0, 13) + '…'; }
+    if (mk) s += `<line x1="${(x + bw / 2).toFixed(1)}" x2="${(x + bw / 2).toFixed(1)}" y1="${T - 6}" y2="${T + ph}" stroke="#0071e3" stroke-opacity=".45" stroke-dasharray="3 3"/><text x="${(x + bw / 2).toFixed(1)}" y="${T - 9}" text-anchor="${i > n - 3 ? 'end' : 'middle'}" style="fill:var(--accent);font-weight:600">${esc(lab)}</text>`;
+    if ((i % 5 === 0 && n - 1 - i > 4) || i === n - 1) s += `<text x="${(x + bw / 2).toFixed(1)}" y="${h - 5}" text-anchor="${i === n - 1 ? 'end' : 'middle'}">${r.d.slice(5)}</text>`;
+    s += `<rect x="${(L + i * band).toFixed(1)}" y="${T}" width="${band.toFixed(1)}" height="${ph}" fill="transparent" data-tip="${r.d.slice(5)}${mk ? '  ' + esc(mk) + ' 发布' : ''}\n${r.segs.length ? r.segs.map(g => PN[g.p] + '  +' + fmt(g.v)).join('\n') + '\n合计  +' + fmt(r.tot) : '没有记录'}"/>`;
+  });
+  el.innerHTML = s + '</svg>';
+}
+function sparkLine(p) {
+  const d = daysBack(30).filter(x => F[p] && F[p][x] != null); if (d.length < 3) return '';
+  const v = d.map(x => F[p][x]), lo = Math.min(...v), hi = Math.max(...v), W = 200, H = 40, X = (i) => i / (d.length - 1) * W, Y = (y) => H - 3 - (hi === lo ? .5 : (y - lo) / (hi - lo)) * (H - 8);
+  const pts = v.map((y, i) => `${X(i).toFixed(1)},${Y(y).toFixed(1)}`).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" data-tip="${PN[p]} 近 ${d.length} 天\n${fmt(v[0])} → ${fmt(v[v.length - 1])}"><defs><linearGradient id="sl-${p}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--p-${p})" stop-opacity=".22"/><stop offset="1" stop-color="var(--p-${p})" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="0,${H} ${pts} ${W},${H}" fill="url(#sl-${p})"/><polyline points="${pts}" fill="none" stroke="var(--p-${p})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
+}
+
+// —— 数据分析：按规则算出几句结论，算不出来的不写 ——
+function insights(cur, ref) {
+  const out = [], add = (k, tag, html) => out.push(`<div class="in"><em class="${k}">${tag}</em><div>${html}</div></div>`);
+  // 1 涨粉主力
+  const g7 = FANP.map(p => ({ p, v: gainN(p, 7) })).filter(x => x.v != null).sort((a, b) => b.v - a.v);
+  if (g7.length) { const tot = g7.reduce((s, x) => s + x.v, 0); add('k3', '涨粉', `近 7 天涨粉最多的是<b>${PN[g7[0].p]} ${sgn(g7[0].v)}</b>${g7.length > 1 ? `，占 ${g7.map(x => PN[x.p]).join('、')} 合计 ${sgn(tot)} 的 <b>${pct(g7[0].v, tot)}</b>` : ''}。`); }
+  // 2 发布日带来的涨粉
+  if (ref && ref.schedule) {
+    const d0 = ref.schedule.slice(0, 10), ps = FANP.filter(p => netOn(p, d0) != null), base = [];
+    for (let i = 1; i <= 7; i++) { const d = dayStr(new Date(new Date(d0 + 'T12:00').getTime() - i * 864e5)); const v = ps.map(p => netOn(p, d)).filter(x => x != null); if (v.length === ps.length && ps.length) base.push(v.reduce((a, b) => a + b, 0)); }
+    const on = ps.reduce((s, p) => s + netOn(p, d0), 0), avg = base.length ? base.reduce((a, b) => a + b, 0) / base.length : 0;
+    if (ps.length && avg > 0) add('k3', '发布日', `「${esc(ref.nick)}」发布当天，${ps.map(p => PN[p]).join('、')}一共涨了 <b>${fmt(on)}</b> 粉，${on >= avg ? `是此前 7 天日均（${fmt(avg)}）的 <b>${(on / avg).toFixed(1)} 倍</b>` : `比此前 7 天日均（${fmt(avg)}）<b>少 ${((1 - on / avg) * 100).toFixed(0)}%</b>，这一期当天没有带来额外涨粉`}。`);
+  }
+  if (ref) {
+    const rows = PL.map(p => ({ p, m: M(ref, p) })).filter(x => x.m && x.m.views >= 200).map(x => ({ ...x, r: inter(x.m) / x.m.views, f: (x.m.favorites || 0) / x.m.views }));
+    // 3 播放集中度
+    const top = [...rows].sort((a, b) => b.m.views - a.m.views)[0];
+    if (top && ref.views) add('k2', '播放', `「${esc(ref.nick)}」<b>${pct(top.m.views, ref.views)}</b> 的播放来自<b>${PN[top.p]}</b>（${fmt(top.m.views)} / ${fmt(ref.views)}）。`);
+    // 4 互动率
+    const byR = [...rows].sort((a, b) => b.r - a.r);
+    if (byR.length >= 2) { const a = byR[0], z = byR[byR.length - 1]; add('', '互动', `互动率最高的是<b>${PN[a.p]} ${(a.r * 100).toFixed(1)}%</b>，最低的是${PN[z.p]} ${(z.r * 100).toFixed(1)}%，相差 <b>${(a.r / Math.max(z.r, .0001)).toFixed(0)} 倍</b>。`); }
+    // 5 收藏
+    const byF = rows.filter(x => x.m.favorites != null).sort((a, b) => b.f - a.f)[0];
+    if (byF && byF.f > 0) add('', '收藏', `<b>${PN[byF.p]}</b>每 100 次播放有 <b>${(byF.f * 100).toFixed(1)}</b> 个收藏，是各平台里最把这期当干货存的。`);
+  }
+  // 6 渠道付费
+  const ch = O.site.channels.filter(c => ['bilibili', 'douyin', 'xiaohongshu', 'twitter', 'youtube'].includes(c.source) && c.reg >= 50).map(c => ({ ...c, r: c.vip / c.reg })).sort((a, b) => b.r - a.r);
+  if (ch.length >= 2) { const a = ch[0], z = ch[ch.length - 1]; add('k4', '转化', `知识站里，来自<b>${esc(a.label)}</b>的注册有 <b>${(a.r * 100).toFixed(1)}%</b> 成了会员；${esc(z.label)} 带来 ${fmt(z.reg)} 个注册，只有 ${(z.r * 100).toFixed(1)}%。`); }
+  return out.slice(0, 6).join('') || '<div class="empty">数据还不够，过两天这里会有结论</div>';
+}
+
+function heroHTML(cur, prev) {
+  const now = Date.now(), at = cur.schedule ? Date.parse(cur.schedule) : null;
+  const pubN = cur.tasks.filter(t => t.state === 'published').length, sch = cur.tasks.filter(t => t.state === 'scheduled').length, todo = cur.tasks.filter(t => ['awaiting_user', 'filled'].includes(t.state)).length, bad = cur.tasks.filter(t => ['failed', 'not_logged_in'].includes(t.state)).length;
+  const plan = cur.tasks.filter(t => t.state === 'planned').length;
+  const st = bad ? `${bad} 个平台异常` : todo ? `${todo} 个平台等你点发布` : plan === cur.tasks.filter(t => t.state !== 'skipped').length ? `${plan} 个平台，还没开跑` : plan ? `${plan} 个平台还没开跑` : sch ? `${pubN} 已发布 · ${sch} 定时` : '全部已发布';
+  const eb = plan && !pubN && !sch ? '分发计划' : bad || todo ? '发布中' : at && at > now ? '即将发布' : at && now - at < 48 * 3600e3 ? '刚发布' : '最新发布';
+  const cmp = prev ? `<div class="cmp">上一期「${esc(prev.nick)}」目前 <b style="color:var(--t1)">${fmt(prev.views)}</b> 播放${cur.views > 1 ? `，这一期是它的 ${pct(cur.views, prev.views)}` : '，这一期发出后在这里对比'}<div class="tr"><i style="width:${Math.min(100, cur.views / Math.max(prev.views, 1) * 100).toFixed(1)}%"></i></div></div>` : '';
+  const [t1, t2] = cur.name.split(/[｜|]/).map(x => x.trim()), k = cur.covers.includes('3x4') ? '3x4' : cur.covers[0], src = `/cover?id=${encodeURIComponent(cur.id)}&k=${k}`;
+  const tabs = SL.length > 1 ? `<div class="ctabs">${SL.map((e, i) => { const d = e.schedule ? new Date(e.schedule) : null, dd = d ? Math.round((new Date(d).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 864e5) : null;
+      const day = dd == null ? '' : dd === 0 ? '今天' : dd === 1 ? '明天' : dd === -1 ? '昨天' : `${d.getMonth() + 1}/${d.getDate()}`, done = e.tasks.every(t => t.state === 'published' || t.state === 'skipped'), warn = e.tasks.some(t => ['failed', 'not_logged_in', 'awaiting_user', 'filled'].includes(t.state));
+      return `<button class="ct${i === HI ? ' on' : ''}" data-i="${i}" title="${esc(e.nick)}：${esc(e.name)}"><i class="${done ? 'ok' : warn ? 'warn' : 'wait'}"></i>${day} ${d ? pad(d.getHours()) + ':' + pad(d.getMinutes()) : esc(e.nick)}${i === HI ? '<u></u>' : ''}</button>`; }).join('')}</div>` : '';
+  return `${cur.covers.length ? `<div class="amb" style="background-image:url('${src}')"></div><div class="stage"><div class="float"><a class="cv" href="/p#/ep/${encodeURIComponent(cur.id)}"><i class="edge"></i><img src="${src}" alt=""><i class="glare"></i><span class="tagz a">第 ${esc(cur.episode)} 期</span><span class="tagz b"><i></i>${pubN}/${cur.tasks.length} 平台已发布</span></a></div></div>` : ''}
+      <div class="inf">${tabs}<div class="eyebrow">${eb}</div><h2>${esc(t1)}</h2>${t2 ? `<div class="subt">${esc(t2)}</div>` : ''}<div class="when"><span id="cd"></span><span style="color:var(--t3)">· ${esc(st)}</span></div>
+        <div class="plats">${PL.map(p => task(cur, p)).filter(Boolean).map(t => { const u = safeUrl(t.url), on = t.state === 'published', cls = on ? 'on' : ['awaiting_user', 'filled'].includes(t.state) ? 'todo' : ['failed', 'not_logged_in'].includes(t.state) ? 'bad' : ''; return `<${u ? `a href="${u}" target="_blank" rel="noopener"` : 'div'} class="pl ${cls}" data-tip="${PN[t.platform]}  ${esc(t.stateCn)}${t.detail ? '\n' + esc(t.detail) : ''}">${logo(t.platform)}<div><b>${PN[t.platform]}</b><span>${on ? (t.m ? (SL.length > 1 ? kfmt(t.m.views) : fmt(t.m.views) + ' 播放') : '已发布') : esc(t.stateCn)}</span></div></${u ? 'a' : 'div'}>`; }).join('')}</div>
+        <div class="nums"><div><div class="lab">全平台播放</div><div class="val">${cur.views > 1 ? fmt(cur.views) : '–'}</div></div><div><div class="lab">互动（赞评藏转）</div><div class="val">${cur.views > 1 ? fmt(cur.inter) : '–'}</div></div><div><div class="lab">互动率</div><div class="val">${cur.views > 1 ? pct(cur.inter, cur.views, 1) : '–'}</div></div></div>${cmp}</div>`;
+}
+let SL = [], HI = null, HID = null, HT = null;
+// 切到第 i 张：只换大卡，不动其他面板
+function show(i, user) {
+  if (!SL.length) return; HI = (i + SL.length) % SL.length; HID = SL[HI].id;
+  const el = $('#hero'); if (!el) return;
+  el.classList.add('fade'); setTimeout(() => { el.innerHTML = heroHTML(SL[HI], PREVOF ? PREVOF(SL[HI]) : null); el.classList.remove('fade'); tick(); fixTabs(); }, 180);
+  if (user) PAUSE = Date.now() + 30000;
+}
+let PAUSE = 0, PREVOF = null;
+const fixTabs = () => { const c = document.querySelector('.ctabs'), o = c && c.querySelector('.ct.on'); if (o) c.scrollLeft = Math.max(0, o.offsetLeft - c.offsetLeft - 40); };
+setInterval(() => { if (SL.length > 1 && Date.now() > PAUSE && !document.hidden && !($('#hero') && $('#hero').matches(':hover'))) show(HI + 1); }, 9000);
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('.ct'); if (b) { e.preventDefault(); show(+b.dataset.i, true); } });
+
+function render() {
+  const eps = O.episodes, days = O.site.days, h = O.health, now = Date.now();
+  F = {}; for (const r of O.followers) (F[r.platform] ||= {})[r.day] = r.total;
+  // 大卡轮播：没全部发完的期 + 48 小时内刚发的期，按发布时间排；默认停在「最近刚发的」，没有就停在「最快要发的」
+  const at = (e) => e.schedule ? Date.parse(e.schedule) : Date.parse(e.createdAt);
+  const open = (e) => e.tasks.some(t => t.state !== 'published' && t.state !== 'skipped');
+  SL = eps.filter(e => open(e) || (at(e) <= now && now - at(e) < 48 * 3600e3)).sort((a, b) => at(a) - at(b));
+  if (!SL.length && eps[0]) SL = [eps[0]];
+  if (HI == null || !SL[HI] || SL[HI].id !== HID) { const live = SL.filter(e => at(e) <= now); HI = live.length ? SL.indexOf(live[live.length - 1]) : 0; }
+  const cur = SL[HI] || eps[0], ref = eps.find(e => e.views > 50) || null;
+  const prevOf = (e) => eps.filter(x => x !== e && x.views > 50 && at(x) < at(e)).sort((a, b) => at(b) - at(a))[0] || eps.find(x => x !== e && x.views > 50) || null;
+  const prev = prevOf(cur); PREVOF = prevOf; HID = cur && cur.id;
+  const today = new Date().toLocaleDateString('zh-CN');
+  const loginOk = Object.values(h.login).every(v => v === 'ok'), checked = h.doctorDay === today;
+  const fansTotal = FANP.reduce((s, p) => s + (latest(p) || 0), 0);
+  const g1 = FANP.map(p => gainN(p, 1)).filter(v => v != null), g7 = FANP.map(p => gainN(p, 7)).filter(v => v != null), g30 = FANP.map(p => gainN(p, 30)).filter(v => v != null);
+  const cover7 = FANP.filter(p => gainN(p, 7) != null), noHist = FANP.filter(p => gainN(p, 1) == null);
+  const marks = Object.fromEntries(eps.filter(e => e.schedule).map(e => [e.schedule.slice(0, 10), e.nick]));
+  const l7 = days.slice(-7);
+  let hero = '<div class="empty">还没有登记的期数</div>';
+  if (cur) hero = heroHTML(cur, prevOf(cur));
+  const card = (p) => {
+    const tot = latest(p), a = gainN(p, 1), b = gainN(p, 7), tc = task(cur, p), mc = M(cur, p), mr = M(prev || ref, p), on = tc && tc.state === 'published';
+    const sp = sparkLine(p);
+    return `<div class="panel pc" style="--c:var(--p-${p})"><div class="nm">${logo(p)}${PN[p]}<small>${FAN_WORD[p] || '粉丝'}</small></div>
+      <div class="val">${kfmt(tot)}</div><div class="gl">${gp('今日', a)}${gp('7 天', b)}${a == null && b == null ? '<span class="gpill">今天开始记录</span>' : ''}</div>
+      <div class="sp">${sp}</div>
+      <div class="ft"><div><span title="${cur ? esc(cur.name) : ''}">${cur ? esc(cur.nick) : '本期'}</span><b>${on && mc ? fmt(mc.views) : tc ? esc(tc.stateCn) : '–'}</b></div><div>${prev || ref ? `<span title="${esc((prev || ref).name)}">${esc((prev || ref).nick)}</span>` : '上期'}<b>${mr ? fmt(mr.views) : '–'}${mr && mr.views >= 50 ? `<span style="display:block;font-weight:400;font-size:11.5px;color:var(--t3)">互动率 ${pct(inter(mr), mr.views, 1)}</span>` : ''}</b></div></div></div>`;
+  };
+  const f0 = O.feed[0];
+  $('#screen').innerHTML = `
+  <div class="top"><div class="logo">天<i>锋</i></div><div class="tag">${O.demo ? '演示数据 · 非真实账号' : '内容与粉丝监控'}</div>
+    <div class="nav"><a class="on" href="/">大屏</a><a href="/p#/traffic">流量</a><a href="/p#/calendar">日历</a>${O.siteOn ? '<a href="/p#/convert">转化</a>' : ''}<a href="/p#/archive">档案</a><a href="/p#/system">系统</a></div>
+    <div class="lights"><span class="light ok">工作台 在线</span><span class="light ${O.daemon ? 'ok' : 'warn'}">${O.demo ? '演示模式' : O.daemon ? '自动任务 运行中' : '自动任务 未启动'}</span><span class="light ${h.nas ? 'ok' : 'bad'}">NAS ${h.nas ? '已挂载' : '读不到'}</span><span class="light ${h.chrome ? 'ok' : 'bad'}">专用浏览器 ${h.chrome ? '在线' : '没开'}</span>
+      <span class="light ${!loginOk ? 'bad' : checked ? 'ok' : 'warn'}">平台登录 ${!loginOk ? '有掉线' : checked ? '今日已检' : '今天还没检'}</span></div>
+    <div class="clock" id="clock"></div></div>
+
+  <div class="r1">
+    <div class="panel hero" id="hero">${hero}</div>
+    <div class="panel fans"><div class="ph"><h3>粉丝</h3><span class="note">${FANP.length} 个平台合计，不含知识站</span></div>
+      <div class="headline"><div class="val xl">${fmt(fansTotal)}</div><div class="g">${gp('今日', g1.length ? g1.reduce((a, b) => a + b, 0) : null)}${gp('近 7 天', g7.length ? g7.reduce((a, b) => a + b, 0) : null)}${gp('近 30 天', g30.length ? g30.reduce((a, b) => a + b, 0) : null)}</div></div>
+      <div class="ph" style="margin:10px 0 2px"><h3 style="font-size:12.5px;color:var(--t2);font-weight:500">每日净增 · 近 30 天</h3><span class="note">${FANP.filter(p => gainN(p, 2) != null).map(p => `<i class="sw" style="width:8px;height:8px;margin:0 5px 0 10px;background:var(--p-${p})"></i>${PN[p]}`).join('')}</span></div>
+      <div class="pb chart" id="c-fans"></div>
+      <div class="cap">${noHist.length ? `${noHist.map(p => PN[p]).join('、')}后台不给历史，从今天开始记；涨跌只统计${cover7.map(p => PN[p]).join('、') || '有历史的平台'}` : '全部平台都有记录'}</div></div>
+    <div class="panel"><div class="ph"><h3>数据分析</h3><span class="note">按规则自动算，每天更新</span></div><div class="pb ins">${insights(cur, ref)}</div></div>
+  </div>
+
+  <div class="cards" style="--n:${PL.length}">${PL.map(card).join('')}</div>
+
+  ${O.siteOn ? `  <a class="panel strip" href="/p#/convert"><h3>${esc(PN.zsz)} · 近 7 天</h3><span>新注册<b>${fmt(sum(l7, 'reg'))}</b></span><span>新会员<b>${fmt(sum(l7, 'vip'))}</b></span><span>订单<b>${fmt(sum(l7, 'orders'))}</b></span><span>收入<b>¥${fmt(sum(l7, 'revenue'))}</b></span>
+    <span class="feedline">${f0 ? `最近动态：${pad(new Date(f0.ts).getHours())}:${pad(new Date(f0.ts).getMinutes())} ${f0.nick ? '「' + esc(f0.nick) + '」' : ''}${esc(f0.platform)} ${esc(f0.action)}${f0.result ? ' · ' + esc(f0.result) : ''}` : ''}</span><span class="go">转化详情 ›</span></a>` : ''}`;
+  draw(); tick(); fixTabs(); if (!render.done) { render.done = true; countUp(); }
+}
+function draw() { if (!O) return; const ins = document.querySelector('.ins'); if (ins && innerWidth > 1100) { [...ins.children].forEach(c => c.style.display = ''); for (let k = ins.children.length - 1; k > 0 && ins.scrollHeight > ins.clientHeight + 2; k--) ins.children[k].style.display = 'none'; } const el = $('#c-fans'); if (!el) return; drawFans(el, daysBack(30), Object.fromEntries(O.episodes.filter(e => e.schedule).map(e => [e.schedule.slice(0, 10), e.nick]))); }
+function countUp() {
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  document.querySelectorAll('.val').forEach(el => {
+    const m = el.textContent.match(/^(\D*)([\d,]+)(\D*)$/); if (!m) return; const to = +m[2].replace(/,/g, ''), t0 = performance.now();
+    const step = (t) => { const k = Math.min(1, (t - t0) / 1100), e = 1 - Math.pow(1 - k, 4); el.textContent = m[1] + Math.round(to * e).toLocaleString('en-US') + m[3]; if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+function tick() {
+  const n = new Date(), c = $('#clock'); if (!c) return;
+  c.innerHTML = `<small>${n.getMonth() + 1}/${n.getDate()} 周${'日一二三四五六'[n.getDay()]}</small>${pad(n.getHours())}:${pad(n.getMinutes())}`;
+  const cd = $('#cd'), cur = O && (SL[HI] || O.episodes[0]);
+  if (cd && cur) {
+    const s = cur.schedule ? Math.round((new Date(cur.schedule) - n) / 1000) : null, d = cur.schedule && new Date(cur.schedule), at = d ? `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}` : '';
+    cd.textContent = s == null ? '' : s > 0 ? (s > 86400 ? `定时 ${at}，还有 ${Math.floor(s / 86400)} 天 ${Math.floor(s % 86400 / 3600)} 小时` : `定时 ${at}，还有 ${Math.floor(s / 3600)}:${pad(Math.floor(s % 3600 / 60))}:${pad(s % 60)}`) : -s < 3600 ? `${at} 发布，已发 ${Math.floor(-s / 60)} 分钟` : -s < 172800 ? `${at} 发布，已发 ${Math.floor(-s / 3600)} 小时` : `${at} 发布，已发 ${Math.floor(-s / 86400)} 天`;
+  }
+}
+async function load() {
+  try { const r = await fetch('/api/overview'); if (!r.ok) throw new Error(r.status); O = await r.json(); document.title = O.demo ? '天锋 · 演示数据' : '天锋 · AI自动化系统'; if (!O.siteOn) PL = PL.filter(p => p !== 'zsz'); else { if (O.siteName) PN.zsz = O.siteName; if (O.siteLogo) LOGO.zsz = { img: '/site-logo' }; } render(); }
+  catch (e) { if (!O) $('#screen').innerHTML = `<div class="empty">连不上天锋服务（${esc(e.message)}）</div>`; else console.error(e); }
+}
+const tip = $('#tip');
+document.addEventListener('mousemove', (e) => { const t = e.target.closest && e.target.closest('[data-tip]'); if (!t) { tip.style.display = 'none'; return; } tip.textContent = t.dataset.tip; tip.style.display = 'block'; const w = tip.offsetWidth; tip.style.left = Math.min(innerWidth - w - 8, e.clientX + 14) + 'px'; tip.style.top = Math.max(8, e.clientY - 34) + 'px'; });
+addEventListener('resize', draw);
+if (matchMedia('(hover:hover)').matches) {
+  let last = null;
+  document.addEventListener('mousemove', (e) => {
+    const hr = e.target.closest && e.target.closest('.hero');
+    if (hr) { const r = hr.getBoundingClientRect(), cv = hr.querySelector('.cv'); if (cv) { cv.style.setProperty('--hy', (((e.clientX - r.left) / r.width - .5) * 22).toFixed(2) + 'deg'); cv.style.setProperty('--hx', ((.5 - (e.clientY - r.top) / r.height) * 14).toFixed(2) + 'deg'); } }
+    else { const cv = document.querySelector('.hero .cv'); if (cv) { cv.style.setProperty('--hy', '0deg'); cv.style.setProperty('--hx', '0deg'); } }
+    const el = e.target.closest && e.target.closest('.panel:not(.hero),.node');
+    if (last && last !== el) { last.style.setProperty('--rx', '0deg'); last.style.setProperty('--ry', '0deg'); }
+    last = el; if (!el) return;
+    const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height, k = Math.min(1, 420 / r.width) * 2.2;
+    el.style.setProperty('--mx', (x * 100).toFixed(1) + '%'); el.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+    el.style.setProperty('--ry', ((x - .5) * k).toFixed(2) + 'deg'); el.style.setProperty('--rx', ((.5 - y) * k).toFixed(2) + 'deg');
+  });
+}
+load(); setInterval(tick, 1000); setInterval(() => { if (!document.hidden) load(); }, 60000);
+</script>
+</body>
+</html>

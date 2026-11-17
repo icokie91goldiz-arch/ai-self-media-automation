@@ -1,0 +1,44 @@
+{
+  "name": "天锋",
+
+  "feishuWebhook": "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+
+  "pluginDir": "/path/to/obsidian-x-publisher",
+  "extensionId": "插件以「加载已解压」安装后，chrome://extensions 里看到的扩展 ID",
+  "bridge": "http://127.0.0.1:8765",
+  "driver": "direct",
+  "chromePort": 9333,
+  "chromeProfile": "~/publish-hub/chrome-profile",
+
+  "rootPath": "/Volumes/<NAS 共享名>/视频导出",
+  "nasUrl": "smb://<用户名>@<NAS 地址>/<共享名>",
+
+  "batches": [["bilibili", "douyin"], ["xhs", "channels"], ["zsz", "x"], ["youtube"], ["instagram"]],
+  "auto": ["zsz", "x", "youtube", "instagram"],
+  "manual": ["bilibili", "douyin", "xhs", "channels"],
+
+  "keepAlive": ["channels"],
+  "keepAliveMinutes": 60,
+  "sampleHours": 6,
+
+  "xHandle": "你的 X 用户名（不带 @）",
+
+  "web": { "port": 8787, "key": "换成一串随机字符，网页访问口令", "login": "feishu（可选：远程打开时用飞书验证码登录，不用带口令；不要就删掉这一项）", "widgetToken": "可选：iPhone 小组件用的只读口令，随便一串随机字符", "owner": "可选：小组件上的署名，如 你的名字", "avatar": "可选：小组件上的头像图片路径，如 data/avatar.jpg", "access": { "team": "可选：挂了 Cloudflare Access 邮箱登录时填 <团队名>.cloudflareaccess.com", "aud": "Access 应用的 AUD Tag" } },
+  "tunnel": { "name": "maitian", "hostname": "固定远程地址，如 maitian.your-domain.com（可选，不配就用每次重启会变的临时地址）" },
+
+  "site": {
+    "name": "知识站",
+    "base": "https://your-site.example.com",
+    "adminPath": "/admin",
+    "coursesApi": "/api/courses?admin=1",
+    "dashboardApi": "/api/admin/dashboard",
+    "coursePath": "/series/{seriesId}?courseId={id}",
+    "logo": "可选：站点图标的本地路径，比如 data/site-logo.png"
+  },
+
+  "board": {
+    "url": "飞书多维表格看板地址（可选，不用就删掉 board 整块）",
+    "baseToken": "多维表格 base token",
+    "tables": { "episodes": "tblxxx", "tasks": "tblxxx", "daily": "tblxxx", "site": "tblxxx", "channels": "tblxxx" }
+  }
+}

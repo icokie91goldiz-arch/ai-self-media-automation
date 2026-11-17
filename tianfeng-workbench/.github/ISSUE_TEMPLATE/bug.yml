@@ -1,0 +1,27 @@
+name: 出问题了
+description: 某个平台没填上、数据没采到、网页显示不对
+labels: [bug]
+body:
+  - type: dropdown
+    id: part
+    attributes:
+      label: 哪一块
+      options: [发布（hub run / plan）, 数据采集（日报 / 粉丝）, 复盘 / 周报, 网页大屏, 飞书通知, 安装向导 / 演示模式, 其他]
+    validations: { required: true }
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 哪个平台
+      multiple: true
+      options: [B站, 抖音, 小红书, 视频号, YouTube, X, 自有站点, 不涉及]
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 期望是什么、实际是什么。贴上 node src/hub.mjs status <id> --logs 的相关几行（记得去掉链接里的个人信息）
+    validations: { required: true }
+  - type: input
+    id: env
+    attributes:
+      label: 环境
+      placeholder: macOS 版本 / Node 版本 / 麦田提交号

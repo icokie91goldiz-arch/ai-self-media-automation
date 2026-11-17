@@ -1,0 +1,12 @@
+Tianfeng AI Automation — modified distribution, 2026-11-17.
+
+Original workbench: CzzzzzzJ/mdldm-maitian, MIT, author 麦当 mdldm.
+Original publisher: CzzzzzzJ/mdldm-maitian-publisher, Apache-2.0, author 麦当 mdldm.
+Original license texts are retained in both component directories.
+
+Changes: Tianfeng branding and icons; local macOS startup controls; private
+per-user configuration; loopback-only listener; separate read-only demo;
+accurate daemon status labels; local publishing Skill and documentation.
+These changes are not endorsed by the upstream authors.
+
+Tianfeng names and brand assets are not included in the software license grant.

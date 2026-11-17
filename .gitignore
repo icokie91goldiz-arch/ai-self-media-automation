@@ -1,0 +1,22 @@
+# Runtime and private data
+**/node_modules/
+**/.DS_Store
+**/__pycache__/
+**/config.json
+**/.env
+**/.env.*
+!**/.env.example
+**/data/
+**/demo/
+**/chrome-profile/
+**/logs/
+**/state/
+**/scratch/
+**/*.db
+**/*.db-*
+**/*.sqlite*
+**/*.log
+发布工程/*
+!发布工程/.gitkeep
+验收/
+开源发布/
